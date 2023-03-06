@@ -1,27 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm/data-source';
-import { Message } from '../../database/entities/message.entity';
-import { Repository } from 'typeorm/repository/Repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { Message } from 'src/database/entities/message.entity';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class MessagesService {
-	//constructor(@Inject('DATA_SOURCE') private db: DataSource){
-	//}
+	private messageRepo: Repository<Message>;
+	constructor(
+		@Inject('DATA_SOURCE')
+		private dataSource: DataSource){
+			this.messageRepo = this.dataSource.getRepository(Message);
+		}
+
 	createMessage(payload): any {
-		return {
-			id: "",
-			user: "",
+		const newMessage = this.messageRepo.create({
 			title: payload.title,
 			text: payload.content,
-			comments: [],
-			reactions: [],
-			createdAt: "" 
-		}
+		})
+		return this.messageRepo.save(newMessage);
 	}
 
 	async getAllMessages(): Promise <any> {
-		//let messageRepo: Repository<Message> = this.db.getRepository(Message);
-		//return await messageRepo.find();
+		return await this.messageRepo.find();
 	}
 
 	getUserMessages(): string {
