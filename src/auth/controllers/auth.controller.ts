@@ -9,11 +9,11 @@ export class AuthController {
 
   @Post('/signup')
   signUp(@Body() payload: SignUpDto){
-    return 
+    return payload;
   }
   
   @Post('/signin')
   signin(@Body() payload: SignInDto){
-    return
+    return payload;
   }
 }
