@@ -9,7 +9,6 @@ export class User {
   id: string;
 
   @Column({
-    unique: true,
     nullable: false
   })
   username: string;

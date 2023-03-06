@@ -9,6 +9,7 @@ import { CreateCommentDto } from '../dtos/create-comment.dto';
 @Controller('/wires/messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
+
   @Post()
   createMessage(@Body() payload: CreateMessageDto){
     return this.messagesService.createMessage(payload);

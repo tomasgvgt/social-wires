@@ -12,10 +12,13 @@ export class AuthService {
   ){
     this.userRepo = this.dataSource.getRepository(User);
   }
-  createUser(payload){
-    const payload.password = hashPassword(payload.password);
-    //Save new user 
-    //return requirements from project
+  async createUser(payload): Promise<any>{
+    payload.password = await hashPassword(payload.password);
+    let newUser = this.userRepo.create(payload);
+    let savedUser: any= await this.userRepo.save(newUser);
+    delete savedUser.password;
+    delete savedUser.created_at;
+    return savedUser;
   }
   authenticateUser(payload){
     //Authenticate password
