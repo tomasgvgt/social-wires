@@ -7,7 +7,7 @@ import { MessagesModule } from './messages/messages.module'
 
 @Module({
   imports: [
-    MessagesModule
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

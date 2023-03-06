@@ -15,6 +15,7 @@ export class MessagesService {
 		const newMessage = this.messageRepo.create({
 			title: payload.title,
 			text: payload.content,
+			//Set user Id according to the ID sent in authentication.
 		})
 		return this.messageRepo.save(newMessage);
 	}
