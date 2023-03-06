@@ -11,13 +11,13 @@ export class MessagesService {
 			this.messageRepo = this.dataSource.getRepository(Message);
 		}
 
-	createMessage(payload): any {
+	async createMessage(payload): Promise<any> {
 		const newMessage = this.messageRepo.create({
 			title: payload.title,
 			text: payload.content,
 			//Set user Id according to the ID sent in authentication.
 		})
-		return this.messageRepo.save(newMessage);
+		return await this.messageRepo.save(newMessage);
 	}
 
 	async getAllMessages(): Promise <any> {
