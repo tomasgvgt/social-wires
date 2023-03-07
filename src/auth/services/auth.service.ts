@@ -21,18 +21,13 @@ export class AuthService {
     return savedUser;
   }
   async authenticateUser(payload){
-    //find user
     let username = payload.username;
     let user = await this.userRepo.findOneBy({
       username
     })
-    console.log(user);
-    //Authenticate password
     const isEqual = await verifyPassword(payload.password, user.password);
     if(isEqual === true){
-      //Create a token with id
       const token = createToken(user);
-      //return requirements from project
       return token;
     }
   }
