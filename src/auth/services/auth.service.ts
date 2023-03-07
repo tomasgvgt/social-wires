@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { User } from 'src/database/entities/user.entity';
 import { hashPassword, verifyPassword } from '../helpers/password';
-
+import { createToken } from '../helpers/token'
 @Injectable()
 export class AuthService {
   userRepo: Repository<User>;
@@ -20,10 +20,20 @@ export class AuthService {
     delete savedUser.created_at;
     return savedUser;
   }
-  authenticateUser(payload){
+  async authenticateUser(payload){
+    //find user
+    let username = payload.username;
+    let user = await this.userRepo.findOneBy({
+      username
+    })
+    console.log(user);
     //Authenticate password
-    //Create a token with id
-    //return requirements from project
+    const isEqual = await verifyPassword(payload.password, user.password);
+    if(isEqual === true){
+      //Create a token with id
+      const token = createToken(user);
+      //return requirements from project
+      return token;
+    }
   }
-
 }
