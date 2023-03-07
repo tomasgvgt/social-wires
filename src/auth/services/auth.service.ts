@@ -31,4 +31,11 @@ export class AuthService {
       return token;
     }
   }
+
+  async getUser(id){
+    let user = await this.userRepo.findOneBy({
+      id
+    })
+    return user
+  }
 }
