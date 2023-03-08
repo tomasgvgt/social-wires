@@ -1,22 +1,27 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Message } from 'src/database/entities/message.entity';
+import { User } from 'src/database/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class MessagesService {
 	private messageRepo: Repository<Message>;
+	private userRepo: Repository<User>;
 	constructor(
 		@Inject('DATA_SOURCE')
 		private dataSource: DataSource){
 			this.messageRepo = this.dataSource.getRepository(Message);
+			this.userRepo = this.dataSource.getRepository(User);
 		}
 
-	async createMessage(payload): Promise<any> {
+	async createMessage(id, payload): Promise<any> {
+		const user = await this.userRepo.findOneBy({id});
 		const newMessage = this.messageRepo.create({
 			title: payload.title,
 			text: payload.content,
-			//Set user Id according to the ID sent in authentication.
+			
 		})
+		newMessage.user = user;
 		return await this.messageRepo.save(newMessage);
 	}
 
@@ -24,16 +29,32 @@ export class MessagesService {
 		return await this.messageRepo.find();
 	}
 
-	getUserMessages(): string {
-		return `Authenticated User Messages`;
+	async getUserMessages(id): Promise<any> {
+		let user: any = await this.userRepo.findOne({
+			where: {id},
+			relations: ['messages']
+		});
+		return user.messages;
 	}
 
-	getMessageById(id: number): string {
-		return `Message with Id ${id}`;
+	async getMessageById(userId, messageId): Promise<any> {
+
+		const message = await this.messageRepo.findOne({
+			where: {
+				id: messageId,
+				user: {id: userId}
+			}
+		});
+		return message
+
+		//const child = await childRepository.findOne({ where: { id: childId, parent: { id: parentId } } });
 	}
 
-	deleteMessageFromUser(id: number): string {
-		return `Message ${id} successfully deleted`
+	async deleteMessageFromUser(userId, messageId): Promise<any> {
+		const message = await this.getMessageById(userId, messageId)
+		console.log(message);
+		await this.messageRepo.remove(message);
+		return `Message successfully deleted`
 	}
 
 	createReaction(id, payload): any {
