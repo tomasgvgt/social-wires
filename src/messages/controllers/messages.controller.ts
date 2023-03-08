@@ -12,8 +12,9 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  createMessage(@Body() payload: CreateMessageDto){
-    return this.messagesService.createMessage(payload);
+  @UseGuards(JwtAuthGuard)
+  createMessage(@Req() request, @Body() payload: CreateMessageDto){
+    return this.messagesService.createMessage(request.id, payload);
   }
 
   @Get()
@@ -24,17 +25,24 @@ export class MessagesController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   getUserMessages(@Req() request){
+    console.log(request.id)
     return this.messagesService.getUserMessages(request.id);
   }
 
   @Get('/:id')
-  getMessageById(@Param('id') id: number){
-    return this.messagesService.getMessageById(id);
+  @UseGuards(JwtAuthGuard)
+  async getMessageById(@Req() request, @Param('id') id){
+    const messageId = id;
+    const userId: Promise<any> = await request.id;
+    return this.messagesService.getMessageById(userId, messageId);
   }
 
   @Delete('/:id')
-  deleteMessageFromUser(@Param('id') id: number){
-    return this.messagesService.deleteMessageFromUser(id);
+  @UseGuards(JwtAuthGuard)
+  async deleteMessageFromUser(@Req() request, @Param('id') id){
+    const messageId = id;
+    const userId: Promise<any> = await request.id;
+    return this.messagesService.deleteMessageFromUser(userId, messageId);
   }
 
   @Patch('/reaction/:id')
