@@ -10,6 +10,9 @@ export class Reaction {
   @Column()
   reaction: string;
 
+  @Column()
+  author: string;
+
   @CreateDateColumn()
   created_at: Date;
 
