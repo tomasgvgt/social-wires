@@ -1,17 +1,23 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Message } from 'src/database/entities/message.entity';
 import { User } from 'src/database/entities/user.entity';
+import { Comment } from 'src/database/entities/comment.entity';
+import { Reaction } from 'src/database/entities/reaction.entity';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class MessagesService {
 	private messageRepo: Repository<Message>;
 	private userRepo: Repository<User>;
+	private commentRepo: Repository<Comment>;
+	private reactionRepo: Repository<Reaction>;
 	constructor(
 		@Inject('DATA_SOURCE')
 		private dataSource: DataSource){
 			this.messageRepo = this.dataSource.getRepository(Message);
 			this.userRepo = this.dataSource.getRepository(User);
+			this.commentRepo = this.dataSource.getRepository(Comment);
+			this.reactionRepo = this.dataSource.getRepository(Reaction);
 		}
 
 	async createMessage(id, payload): Promise<any> {
@@ -57,32 +63,49 @@ export class MessagesService {
 		return `Message successfully deleted`
 	}
 
-	createReaction(id, payload): any {
-		return {
-			id,
-			user: "",
-			title: "",
-			text: "",
-			comments: [],
-			reactions: [
-				{
-					"author": payload.author,
-					"reaction:": payload.reaction
-				}
-			],
-			createdAt: "" 
-		}
+	async createReaction(userId, messageId, payload): Promise<any> {
+		let message = await this.messageRepo.findOne({
+			where: {
+				id: messageId,
+			}
+		});
+		if(message === null) return "Message doesn't exist";
+		message = await this.messageRepo.findOne({
+			where: {
+				id: messageId,
+				user: {id: userId}
+			}
+		});
+		//if(message !== null) return "A user cant comment its messages"
+		const newReaction = this.reactionRepo.create({
+			reaction: payload.reaction,
+			author: payload.author,
+		})
+		newReaction.message = message;
+		await this.reactionRepo.save(newReaction);
+		return message
 	}
 
-	createComment(id, payload): any {
-		return {
-			id,
-			user: "",
-			title: "",
-			text: "",
-			comments: [],
-			reactions: [],
-			createdAt: "" 
-		}
+	async createComment(userId, messageId, payload): Promise<any> {
+		let message = await this.messageRepo.findOne({
+			where: {
+				id: messageId,
+			}
+		});
+		if(message === null) return "Message doesn't exist";
+		message = await this.messageRepo.findOne({
+			where: {
+				id: messageId,
+				user: {id: userId}
+			}
+		});
+		//if(message !== null) return "A user cant comment its messages"
+		const newComment = this.commentRepo.create({
+			comment: payload.comment,
+			author: payload.author,
+		})
+		newComment.message = message;
+		await this.commentRepo.save(newComment);
+		return message
 	}
 }

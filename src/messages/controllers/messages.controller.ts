@@ -46,13 +46,19 @@ export class MessagesController {
   }
 
   @Patch('/reaction/:id')
-  createReaction(@Param('id') id: number, @Body() payload: CreateReactionDto){
-    return this.messagesService.createReaction(id, payload);
+  @UseGuards(JwtAuthGuard)
+  async createReaction(@Req() request, @Param('id') id: number, @Body() payload: CreateReactionDto){
+    const messageId = id;
+    const userId: Promise<any> = await request.id;
+    return this.messagesService.createReaction(userId, messageId, payload);
   }
 
   @Patch('/comment/:id')
-  createComment(@Param('id') id: number , @Body() payload: CreateCommentDto){
-    return this.messagesService.createComment(id, payload);
+  @UseGuards(JwtAuthGuard)
+  async createComment(@Req() request, @Param('id') id: number , @Body() payload: CreateCommentDto){
+    const messageId = id;
+    const userId: Promise<any> = await request.id;
+    return this.messagesService.createComment(userId, messageId, payload);
   }
 
 }

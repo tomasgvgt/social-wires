@@ -8,15 +8,16 @@ export class Comment {
   id: string;
 
   @Column({
-    nullable: false
+    nullable: false,
+    type: 'text'
   })
-  title: string;
+  comment: string;
 
   @Column({
     nullable: false,
     type: 'text'
   })
-  text: string;
+  author: string;
 
   @CreateDateColumn()
   created_at: Date;
