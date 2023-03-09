@@ -14,7 +14,7 @@ export class MessagesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   createMessage(@Req() request, @Body() payload: CreateMessageDto){
-    return this.messagesService.createMessage(request.id, payload);
+    return this.messagesService.createMessage(request.user, payload);
   }
 
   @Get()
@@ -25,15 +25,14 @@ export class MessagesController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   getUserMessages(@Req() request){
-    console.log(request.id)
-    return this.messagesService.getUserMessages(request.id);
+    return this.messagesService.getUserMessages(request.user);
   }
 
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
   async getMessageById(@Req() request, @Param('id') id){
     const messageId = id;
-    const userId: Promise<any> = await request.id;
+    const userId: Promise<any> = await request.user;
     return this.messagesService.getMessageById(userId, messageId);
   }
 
@@ -41,7 +40,7 @@ export class MessagesController {
   @UseGuards(JwtAuthGuard)
   async deleteMessageFromUser(@Req() request, @Param('id') id){
     const messageId = id;
-    const userId: Promise<any> = await request.id;
+    const userId: Promise<any> = await request.user;
     return this.messagesService.deleteMessageFromUser(userId, messageId);
   }
 
@@ -49,7 +48,7 @@ export class MessagesController {
   @UseGuards(JwtAuthGuard)
   async createReaction(@Req() request, @Param('id') id: number, @Body() payload: CreateReactionDto){
     const messageId = id;
-    const userId: Promise<any> = await request.id;
+    const userId: Promise<any> = await request.user;
     return this.messagesService.createReaction(userId, messageId, payload);
   }
 
@@ -57,7 +56,7 @@ export class MessagesController {
   @UseGuards(JwtAuthGuard)
   async createComment(@Req() request, @Param('id') id: number , @Body() payload: CreateCommentDto){
     const messageId = id;
-    const userId: Promise<any> = await request.id;
+    const userId: Promise<any> = await request.user;
     return this.messagesService.createComment(userId, messageId, payload);
   }
 
