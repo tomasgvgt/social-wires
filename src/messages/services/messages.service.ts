@@ -22,6 +22,7 @@ export class MessagesService {
 
 	async createMessage(id, payload): Promise<any> {
 		const user = await this.userRepo.findOneBy({id});
+		console.log("user: " + user);
 		const newMessage = this.messageRepo.create({
 			title: payload.title,
 			text: payload.content,
@@ -70,13 +71,13 @@ export class MessagesService {
 			}
 		});
 		if(message === null) return "Message doesn't exist";
-		message = await this.messageRepo.findOne({
+		let messageFromThesameUser = await this.messageRepo.findOne({
 			where: {
 				id: messageId,
 				user: {id: userId}
 			}
 		});
-		//if(message !== null) return "A user cant comment its messages"
+		if(messageFromThesameUser !== null) return "A user cant  react to its messages"
 		const newReaction = this.reactionRepo.create({
 			reaction: payload.reaction,
 			author: payload.author,
@@ -93,19 +94,19 @@ export class MessagesService {
 			}
 		});
 		if(message === null) return "Message doesn't exist";
-		message = await this.messageRepo.findOne({
+		let messageFromThesameUser = await this.messageRepo.findOne({
 			where: {
 				id: messageId,
 				user: {id: userId}
 			}
 		});
-		//if(message !== null) return "A user cant comment its messages"
+		if(messageFromThesameUser !== null) return "A user cant comment its messages"
 		const newComment = this.commentRepo.create({
 			comment: payload.comment,
 			author: payload.author,
 		})
 		newComment.message = message;
 		await this.commentRepo.save(newComment);
-		return message
+		return newComment;
 	}
 }

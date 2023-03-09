@@ -25,7 +25,6 @@ export class AuthService {
     let user = await this.userRepo.findOneBy({
       username
     })
-    console.log(user);
     const isEqual = await verifyPassword(payload.password, user.password);
     if(isEqual === true){
       const token = createToken(user);
